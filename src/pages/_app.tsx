@@ -1,4 +1,4 @@
-import "../styles/globals.css";
+import "@/styles/globals.css";
 import { withTRPC } from "@trpc/next";
 import { AppProps } from "next/app";
 import { AppRouter } from "@/backend/router";
