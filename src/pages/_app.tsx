@@ -26,5 +26,5 @@ export default withTRPC<AppRouter>({
       url: `${getBaseUrl()}/api/trpc`,
     };
   },
-  ssr: true,
+  ssr: false,
 })(MyApp);

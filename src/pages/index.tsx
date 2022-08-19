@@ -1,80 +1,81 @@
 import { getOptionsForVote } from "@/utils/pokemon";
-import { trpc } from "@/utils/trpc";
-import type { GetServerSideProps, NextPage } from "next";
+import { inferQueryResponse, trpc } from "@/utils/trpc";
+import type { NextPage } from "next";
 import Image from "next/image";
+import { useState } from "react";
 
 type HomeProps = {
-  first: number;
-  second: number;
+  initialIds: number[];
 };
 
-export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
-  const [first, second] = getOptionsForVote();
-  return { props: { first, second } };
-};
-
-const Home: NextPage<HomeProps> = ({ first, second }) => {
-  const {
-    data: firstPokemon,
-    isLoading: isFirstLoading,
-    isError: isFirstError,
-  } = trpc.useQuery([
+const Home: NextPage<HomeProps> = () => {
+  const [ids, updateIds] = useState(() => getOptionsForVote());
+  const [first, second] = ids;
+  const firstPokemon = trpc.useQuery([
     "get-pokemon-by-id",
     {
       id: first,
     },
   ]);
-  const {
-    data: secondPokemon,
-    isLoading: isSecondLoading,
-    isError: isSecondError,
-  } = trpc.useQuery([
+  const secondPokemon = trpc.useQuery([
     "get-pokemon-by-id",
     {
       id: second,
     },
   ]);
 
-  if (isFirstLoading || isSecondLoading) return <>Loading...</>;
+  if (firstPokemon.isError || secondPokemon.isError) return <>Error</>;
 
-  if (isFirstError || isSecondError || !firstPokemon || !secondPokemon)
-    return <>Error</>;
+  const voteForRoundest = (selected: number) => {};
 
   return (
     <div className="h-screen w-screen flex flex-col justify-center items-center">
       <div className="text-2xl text-center">Which Pokemon is rounder?</div>
       <div className="p-2" />
       <div className="border rounded p-8 flex justify-between items-center max-w-2xl">
-        <div className="flex flex-col">
-          <div className="w-64 h-64">
-            <Image
-              src={firstPokemon.image}
-              width={500}
-              height={500}
-              alt={firstPokemon.name}
-            />
-          </div>
-          <div className="p-4" />
-          <div className="text-xl text-center capitalize">
-            {firstPokemon.name}
-          </div>
-        </div>
-        <div className="p-8">Vs</div>
-        <div className="flex flex-col">
-          <div className="w-64 h-64">
-            <Image
-              src={secondPokemon.image}
-              width={500}
-              height={500}
-              alt={secondPokemon.name}
-            />
-          </div>
-          <div className="p-4" />
-          <div className="text-xl text-center capitalize">
-            {secondPokemon.name}
-          </div>
-        </div>
+        {!firstPokemon.isLoading &&
+          !secondPokemon.isLoading &&
+          firstPokemon.data &&
+          secondPokemon.data && (
+            <>
+              <PokemonListing
+                pokemon={firstPokemon.data}
+                vote={voteForRoundest}
+              />
+              <div className="p-8">Vs</div>
+              <PokemonListing
+                pokemon={secondPokemon.data}
+                vote={voteForRoundest}
+              />
+            </>
+          )}
       </div>
+    </div>
+  );
+};
+
+type PokemonFromServer = inferQueryResponse<"get-pokemon-by-id">;
+
+const PokemonListing: React.FC<{
+  pokemon: PokemonFromServer;
+  vote: (id: number) => void;
+}> = ({ pokemon, vote }) => {
+  return (
+    <div className="flex flex-col">
+      <Image
+        className="w-64 h-64"
+        src={pokemon.image}
+        width={500}
+        height={500}
+        alt={pokemon.name}
+      />
+      <div className="p-4" />
+      <button
+        onClick={() => vote(pokemon.id)}
+        className="bg-green-600 hover:bg-green-500 rounded p-2 text-xl capitalize"
+      >
+        {pokemon.name}
+      </button>
     </div>
   );
 };
