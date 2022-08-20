@@ -43,22 +43,11 @@ const Home: NextPage<HomeProps> = () => {
       <div className="text-2xl text-center">Which Pokemon is rounder?</div>
       <div className="p-2" />
       <div className="border rounded p-8 flex justify-between items-center max-w-2xl">
-        {!firstPokemon.isLoading &&
-          !secondPokemon.isLoading &&
-          firstPokemon.data &&
-          secondPokemon.data && (
-            <>
-              <PokemonListing
-                pokemon={firstPokemon.data}
-                vote={voteForRoundest}
-              />
-              <div className="p-8">Vs</div>
-              <PokemonListing
-                pokemon={secondPokemon.data}
-                vote={voteForRoundest}
-              />
-            </>
-          )}
+        <>
+          <PokemonListing pokemon={firstPokemon.data} vote={voteForRoundest} />
+          <div className="p-8">Vs</div>
+          <PokemonListing pokemon={secondPokemon.data} vote={voteForRoundest} />
+        </>
       </div>
     </div>
   );
@@ -67,24 +56,29 @@ const Home: NextPage<HomeProps> = () => {
 type PokemonFromServer = inferQueryResponse<"get-pokemon-by-id">;
 
 const PokemonListing: React.FC<{
-  pokemon: PokemonFromServer;
+  pokemon?: PokemonFromServer;
   vote: (id: number) => void;
 }> = ({ pokemon, vote }) => {
   return (
     <div className="flex flex-col">
-      <Image
-        className="w-64 h-64"
-        src={pokemon.image}
-        width={500}
-        height={500}
-        alt={pokemon.name}
-      />
+      {pokemon ? (
+        <Image
+          src={pokemon.image}
+          width={256}
+          height={256}
+          alt={pokemon.name}
+          layout="fixed"
+        />
+      ) : (
+        <div className="w-64 h-64" />
+      )}
       <div className="p-4" />
       <button
-        onClick={() => vote(pokemon.id)}
+        disabled={!pokemon}
+        onClick={() => pokemon && vote(pokemon.id)}
         className="bg-green-600 hover:bg-green-500 rounded p-2 text-xl capitalize"
       >
-        {pokemon.name}
+        {pokemon ? pokemon.name : "Loading..."}
       </button>
     </div>
   );
