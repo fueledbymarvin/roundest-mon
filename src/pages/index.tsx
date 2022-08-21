@@ -30,9 +30,9 @@ const Home: NextPage<HomeProps> = () => {
 
   const voteForRoundest = (selected: number) => {
     if (selected === first) {
-      voteMutation.mutate({ votedFor: first, votedAgainst: second });
+      voteMutation.mutate({ votedForId: first, votedAgainstId: second });
     } else {
-      voteMutation.mutate({ votedFor: second, votedAgainst: first });
+      voteMutation.mutate({ votedForId: second, votedAgainstId: first });
     }
 
     updateIds(getOptionsForVote());
@@ -63,7 +63,7 @@ const PokemonListing: React.FC<{
     <div className="flex flex-col">
       {pokemon ? (
         <Image
-          src={pokemon.image}
+          src={pokemon.imageUrl}
           width={256}
           height={256}
           alt={pokemon.name}

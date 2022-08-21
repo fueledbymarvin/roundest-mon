@@ -11,16 +11,13 @@ export const appRouter = trpc
     }),
     async resolve({
       input,
-    }): Promise<{ id: number; name: string; image: string }> {
+    }): Promise<{ id: number; name: string; imageUrl: string }> {
       try {
-        const response = await axios.get(
-          `https://pokeapi.co/api/v2/pokemon/${input.id}`
-        );
-        return {
-          id: response.data.id,
-          name: response.data.name,
-          image: response.data.sprites.other["official-artwork"].front_default,
-        };
+        const pokemon = await prisma.pokemon.findFirst({
+          where: { id: input.id },
+        });
+        if (!pokemon) throw "Doesn't exist";
+        return pokemon;
       } catch (error) {
         throw new trpc.TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -32,11 +29,11 @@ export const appRouter = trpc
   })
   .mutation("cast-vote", {
     input: z.object({
-      votedFor: z.number(),
-      votedAgainst: z.number(),
+      votedForId: z.number(),
+      votedAgainstId: z.number(),
     }),
     async resolve({ input }) {
-      const voteInDb = await prisma.vote.create({ data: { ...input } });
+      await prisma.vote.create({ data: { ...input } });
     },
   });
 
