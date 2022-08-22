@@ -2,6 +2,7 @@ import { getOptionsForVote } from "@/utils/pokemon";
 import { inferQueryResponse, trpc } from "@/utils/trpc";
 import type { NextPage } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 type HomeProps = {
@@ -43,11 +44,12 @@ const Home: NextPage<HomeProps> = () => {
       <div className="text-2xl text-center">Which Pokemon is rounder?</div>
       <div className="p-2" />
       <div className="border rounded p-8 flex justify-between items-center max-w-2xl">
-        <>
-          <PokemonListing pokemon={firstPokemon.data} vote={voteForRoundest} />
-          <div className="p-8">Vs</div>
-          <PokemonListing pokemon={secondPokemon.data} vote={voteForRoundest} />
-        </>
+        <PokemonListing pokemon={firstPokemon.data} vote={voteForRoundest} />
+        <div className="p-8">Vs</div>
+        <PokemonListing pokemon={secondPokemon.data} vote={voteForRoundest} />
+      </div>
+      <div className="mt-4 text-xl underline text-pink-400">
+        <Link href="/results">Results</Link>
       </div>
     </div>
   );
