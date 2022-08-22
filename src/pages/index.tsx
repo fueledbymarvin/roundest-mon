@@ -72,7 +72,9 @@ const PokemonListing: React.FC<{
           layout="fixed"
         />
       ) : (
-        <div className="w-64 h-64" />
+        <div className="w-64 h-64 flex items-center justify-center">
+          <Image src="/loading.svg" width={64} height={64} alt="loading" />
+        </div>
       )}
       <div className="p-4" />
       <button
