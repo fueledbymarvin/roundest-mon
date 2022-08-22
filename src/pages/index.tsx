@@ -61,19 +61,23 @@ const PokemonListing: React.FC<{
   pokemon?: PokemonFromServer;
   vote: (id: number) => void;
 }> = ({ pokemon, vote }) => {
+  const [loaded, setLoaded] = useState(false);
   return (
     <div className="flex flex-col">
-      {pokemon ? (
-        <Image
-          src={pokemon.imageUrl}
-          width={256}
-          height={256}
-          alt={pokemon.name}
-          layout="fixed"
-        />
-      ) : (
-        <div className="w-64 h-64 flex items-center justify-center">
-          <Image src="/loading.svg" width={64} height={64} alt="loading" />
+      {pokemon && (
+        <div className={loaded ? "" : "opacity-0 absolute"}>
+          <Image
+            src={pokemon.imageUrl}
+            width={256}
+            height={256}
+            alt={pokemon.name}
+            onLoadingComplete={() => setLoaded(true)}
+          />
+        </div>
+      )}
+      {!loaded && (
+        <div className="opacity-30">
+          <Image src="/loading.svg" width={256} height={256} alt="loading" />
         </div>
       )}
       <div className="p-4" />
