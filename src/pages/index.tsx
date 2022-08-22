@@ -3,7 +3,7 @@ import { inferQueryResponse, trpc } from "@/utils/trpc";
 import type { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 type HomeProps = {
   initialIds: number[];
@@ -62,6 +62,10 @@ const PokemonListing: React.FC<{
   vote: (id: number) => void;
 }> = ({ pokemon, vote }) => {
   const [loaded, setLoaded] = useState(false);
+  useLayoutEffect(() => {
+    setLoaded(false);
+  }, [pokemon]);
+
   return (
     <div className="flex flex-col">
       {pokemon && (
